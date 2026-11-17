@@ -37,6 +37,31 @@ One API call per submission; no automatic retries. Invalid scores are rejected r
 
 ## Checks
 ```sh
-python3 -m unittest -v test_app
+python3 -m unittest -v test_app test_workshop
 ```
 Tests use simulated API responses, not live credentials. Test a real evaluation with your own key before presenting. No secret keys are included in this repository.
+
+
+## Project structure
+```text
+app.py               Streamlit browser interface and deployment entry point
+main.py              Optional launcher: python3 main.py
+models.py            OpenRouter API connection and safe error messages
+evaluator.py         Prompt-scoring pipeline and JSON validation
+rubric.py            Shared criteria and evaluator instructions
+prompts.py           Academic, coding, creative, planning, math, writing, reasoning examples
+errors.py            Shared expected-error type
+starter/tasks.py     Three attendee coding TODOs
+starter/solution.py  Completed reference solution
+starter/README.md    Exercise steps and time guide
+requirements.txt     Dependencies
+test_app.py          Backend and browser checks
+test_workshop.py     Starter/reference integration checks
+```
+
+## Work on your own computer
+Clone this repo or click Code → Download ZIP. Open the project folder in VS Code and follow Run locally above. Enter your own OpenRouter key in the browser. You do not need the presenter's local files, virtual environment, or API key. Dependencies install from requirements.txt.
+
+The example picker fills the prompt box; you can edit it before evaluating. For the coding activity follow starter/README.md. The sidebar's Workshop coding exercise selector switches between the completed app, attendee TODOs, and reference solution. The default remains Completed app, so deploying this repository runs the working evaluator.
+
+**Deploy app.py on Streamlit Cloud**, not main.py or the starter files. main.py is only a convenience for starting the app locally. This project scores prompts; it does not compare generated answers across multiple models.

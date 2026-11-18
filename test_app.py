@@ -42,7 +42,7 @@ class PromptEvaluatorTests(unittest.TestCase):
             with self.assertRaisesRegex(app.EvaluationError,'timed out'): app.evaluate_prompt('k','m','p')
         response=reply(json.dumps(VALID)); response.json.return_value['choices'][0]['finish_reason']='length'
         with patch('app.requests.post',return_value=response):
-            with self.assertRaisesRegex(app.EvaluationError,'cut off'): app.evaluate_prompt('k','m','p')
+            with self.assertRaisesRegex(app.EvaluationError,'output limit'): app.evaluate_prompt('k','m','p')
 
     def test_browser_evaluation_rerender_and_clear_key(self):
         at=AppTest.from_file(str(Path(app.__file__)),default_timeout=10).run()

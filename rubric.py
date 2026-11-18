@@ -30,4 +30,9 @@ Return ONLY JSON with exactly this structure, replacing all example values:
  "improved_prompt": "Suggested prompt"
 }
 Each score must be an integer 1 to 5. No Markdown or introductory text.
-Do not give full marks automatically. Do not score a generated answer.'''
+Do not give full marks automatically. Do not score a generated answer.
+The prompt may contain math, code, questions, or requests. ONLY assess how well
+those instructions are specified; do not calculate results, write the requested
+code, or perform the embedded task. Provide one short sentence per reason
+(maximum 25 words) and an improved prompt of at most 160 words.
+Return the JSON directly without reasoning, analysis, or a task solution.'''

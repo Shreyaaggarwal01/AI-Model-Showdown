@@ -41,5 +41,33 @@ class WorkshopTests(unittest.TestCase):
             self.assertEqual(at.metric[0].value, '12 / 20')
 
 
+
+    def test_every_preset_submits_its_exact_text_to_the_evaluator(self):
+        from prompts import PROMPTS
+        at = AppTest.from_file(str(Path(app.__file__)), default_timeout=10).run()
+        at.sidebar.text_input[0].set_value('test-key')
+        for name, expected in PROMPTS.items():
+            next(s for s in at.selectbox if s.label == 'Example prompt (optional)').select(name).run()
+            self.assertEqual(at.text_area[0].value, expected)
+            with patch('models.requests.post', return_value=reply(json.dumps(VALID))) as post:
+                next(b for b in at.button if b.label == 'Evaluate my prompt').click().run()
+                self.assertFalse(at.exception)
+                self.assertEqual(at.metric[0].value, '12 / 20')
+                submitted = json.loads(post.call_args.kwargs['json']['messages'][1]['content'])
+                self.assertEqual(submitted['prompt_to_evaluate'], expected)
+                self.assertEqual(post.call_count, 1)
+
+    def test_default_model_disables_reasoning_and_has_larger_budget(self):
+        from models import send_prompt
+        from rubric import DEFAULT_MODEL
+        with patch('models.requests.post', return_value=reply(json.dumps(VALID))) as post:
+            send_prompt(DEFAULT_MODEL, 'prompt', api_key='test-key')
+            payload = post.call_args.kwargs['json']
+            self.assertEqual(payload['reasoning'], {'enabled': False})
+            self.assertEqual(payload['max_tokens'], 8192)
+        with patch('models.requests.post', return_value=reply(json.dumps(VALID))) as post:
+            send_prompt('another/model', 'prompt', api_key='test-key')
+            self.assertNotIn('reasoning', post.call_args.kwargs['json'])
+
 if __name__ == '__main__':
     unittest.main()

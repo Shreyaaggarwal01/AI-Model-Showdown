@@ -8,11 +8,16 @@ def send_prompt(model, prompt, *, api_key, system=None):
         raise EvaluationError('Enter an OpenRouter key, evaluator model, and prompt.')
     messages = [{'role': 'system', 'content': system}] if system else []
     messages.append({'role': 'user', 'content': prompt})
+    payload = {'model': model.strip(), 'messages': messages, 'max_tokens': 8192}
+    # The default model supports optional reasoning. Prompt review needs the final
+    # rubric JSON, not a long reasoning trace or a solution to the embedded task.
+    if model.strip().split(':')[0] == 'nvidia/nemotron-3.5-lightning':
+        payload['reasoning'] = {'enabled': False}
     try:
         response = requests.post(
             'https://openrouter.ai/api/v1/chat/completions',
             headers={'Authorization': 'Bearer ' + api_key.strip()},
-            json={'model': model.strip(), 'messages': messages, 'max_tokens': 4096},
+            json=payload,
             timeout=(10, 75),
         )
     except requests.RequestException:
@@ -35,7 +40,7 @@ def send_prompt(model, prompt, *, api_key, system=None):
             raise EvaluationError('The provider returned an error. Check access and usage.')
         choice = data['choices'][0]
         if choice.get('finish_reason') == 'length':
-            raise EvaluationError('Evaluation was cut off. Try a shorter prompt or another model.')
+            raise EvaluationError('The evaluator reached its output limit before finishing. Your prompt is kept. Try again later or use another evaluator model.')
         text = choice['message']['content']
         if not isinstance(text, str) or not text.strip():
             raise EvaluationError('The provider returned no text.')

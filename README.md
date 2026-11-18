@@ -65,3 +65,7 @@ Clone this repo or click Code → Download ZIP. Open the project folder in VS Co
 The example picker fills the prompt box; you can edit it before evaluating. For the coding activity follow starter/README.md. The sidebar's Workshop coding exercise selector switches between the completed app, attendee TODOs, and reference solution. The default remains Completed app, so deploying this repository runs the working evaluator.
 
 **Deploy app.py on Streamlit Cloud**, not main.py or the starter files. main.py is only a convenience for starting the app locally. This project scores prompts; it does not compare generated answers across multiple models.
+
+
+### Preset evaluation output budget
+Preset examples and custom prompts use the same evaluation path. The default NVIDIA evaluator is requested with optional reasoning disabled, concise rubric instructions, and an 8,192-token output ceiling. Other model IDs do not receive the model-specific reasoning flag. Output caps still include provider-specific reasoning behavior, and provider availability is outside the app's control. Tests verify all seven preset texts reach the evaluator intact; live provider responses were not tested without user credentials.
